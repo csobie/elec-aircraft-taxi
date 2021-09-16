@@ -23,6 +23,13 @@ This analysis touches on the following topics:
 
 ## Implementation
 
+### ETL
+Public aircraft tracking data is available from [OpenSky](https://opensky-network.org/). The API provides live position data, as well as historical data when the administrators granted access. As I haven't been granted access, I'm using data from the [Weekly 24 hours of State Vector Data](https://opensky-network.org/data/datasets#d1) dump, which provides all recorded data for Mondays going back about six months. This data is provided as compressed CSV, JSON, or Avro files. Here I'll use the CSV files.
 
+The data amounts to ~60GB of compressed and ~250GB of uncompressed data. Since I'm concerned with only a tiny subset of this, the first step is to cut the data down to the regions of interest, namely a few airports. I do this by created a bounding box from the airport information provided in the [traffic](https://traffic-viz.github.io/airports.html) package, which themselves are taken from the OpenStreetMaps bounding polygon. I use a box used rather than the polygon, because checking if a point is in a convex shape is fast ([example algorithm](https://demonstrations.wolfram.com/AnEfficientTestForAPointToBeInAConvexPolygon/)), and airports are generally not convex polygons.
+
+Add images here
+
+Next, altitude and speed filters remove any aircraft flying over the region. Then takeoffs are isolated, which is done with another speed filter (applied to the start/end of the data). These steps produce a Multiindex Dataframe, which I save to a parquet file.
 
 ## Future Perspectives
